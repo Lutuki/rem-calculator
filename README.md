@@ -26,4 +26,4 @@ Al utilizar esta página aceptas que se envíen los siguientes datos del sistema
 - Nombre del buscador
 - IP Pública
 
-Estos datos no serán compartidos con terceros, si deseas que tus datos sean eliminados por favor contacta por soporte de github pages.
+Estos datos no serán compartidos con terceros, si deseas que tus datos sean eliminados por favor contacta por soporte de github pages o elimina las cookies de la página. (No nos hacemos responsables del mal funcionamento de la página al utilizar esto)
