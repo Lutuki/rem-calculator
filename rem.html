@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Calculadora de sueño para estimar la cantidad de horas de sueño que necesitas para dormir.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="rem_logo.png"image/x-icon">
+  <title>Calculadora de Sueño</title>
+  <style>
+    :root {
+      --bg-color-light: #f8f9fa;
+      --text-color-light: #212529;
+      --container-bg-light: #ffffff;
+      --border-light: #dee2e6;
+      --shadow-light: rgba(0, 0, 0, 0.1);
+      --input-bg-light: #ffffff;
+      --input-border-light: #ced4da;
+      
+      --bg-color-dark: #121212;
+      --text-color-dark: #f8f9fa;
+      --container-bg-dark: #1e1e1e;
+      --border-dark: #333333;
+      --shadow-dark: rgba(255, 255, 255, 0.05);
+      --input-bg-dark: #2d2d2d;
+      --input-border-dark: #444444;
+      
+      --primary-color: #4CAF50;
+      --primary-hover: #3e9142;
+      --accent-color: #2196F3;
+      --accent-hover: #0b7dda;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+      width: 100%;
+    }
+
+    html {
+      overflow-x: hidden; /* Ensure no horizontal scroll on html element too */
+      max-width: 100%;
+    }
+
+    .main-content {
+      padding: 2rem;
+      width: 100%;
+      max-width: 800px;
+      box-sizing: border-box;
+      margin-top: 2rem;
+      overflow-x: hidden; /* Prevent content overflow */
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      transition: background-color 0.3s;
+    }
+
+    /* Language toggle button styles */
+    .language-toggle {
+      position: absolute;
+      top: 1rem;
+      right: -37rem; /* Position it to the left of the theme toggle */
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      transition: background-color 0.3s;
+      position: relative;
+    }
+
+    .language-toggle:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark .language-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .language-toggle img {
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .language-dropdown {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background-color: var(--container-bg-light);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--shadow-light);
+      padding: 0.5rem;
+      display: none;
+      flex-direction: column;
+      min-width: 140px;
+      z-index: 100;
+      border: 1px solid var(--border-light);
+    }
+
+    body.dark .language-dropdown {
+      background-color: var(--container-bg-dark);
+      box-shadow: 0 4px 12px var(--shadow-dark);
+      border: 1px solid var(--border-dark);
+    }
+
+    .language-dropdown.show {
+      display: flex;
+    }
+
+    .language-option {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      margin-bottom: 0.3rem;
+    }
+
+    .language-option:last-child {
+      margin-bottom: 0;
+    }
+
+    .language-option:hover {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .language-option .flag {
+      font-size: 1.2rem;
+      margin-right: 0.8rem;
+    }
+
+    .language-option.active {
+      font-weight: bold;
+      background-color: rgba(76, 175, 80, 0.15);
+    }
+
+    .language-code {
+      display: inline-block;
+      width: 30px;
+      font-weight: 600;
+      opacity: 0.7;
+      margin-right: 0.5rem;
+    }
+
+    body.light .language-toggle {
+      color: var(--text-color-light);
+    }
+
+    body.dark .language-toggle {
+      color: var(--text-color-dark);
+    }
+
+    .main-content {
+      padding: 2rem;
+      width: 100%;
+      max-width: 800px;
+      box-sizing: border-box;
+      margin-top: 2rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-top: -1rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .container {
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 2rem;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    label {
+      display: block;
+      margin: 1rem 0 0.5rem;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1.2rem;
+      box-sizing: border-box;
+      transition: background-color 0.3s, border 0.3s, color 0.3s;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+      background-color: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .result {
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      line-height: 1.6;
+      transition: background-color 0.3s;
+    }
+
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      width: 100%;
+      background-color: transparent;
+      border-radius: 10px;
+      padding: 0.5rem;
+      transition: background-color 0.3s;
+    }
+
+    .menu-item {
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 0 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .menu-item.active {
+      background-color: var(--primary-color);
+      color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-item:not(.active):hover {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .history-item {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+      width: 100%;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Light theme */
+    body.light {
+      background-color: var(--bg-color-light);
+      color: var(--text-color-light);
+    }
+
+    body.light .container {
+      background-color: var(--container-bg-light);
+      box-shadow: 0 4px 12px var(--shadow-light);
+      border: 1px solid var(--border-light);
+    }
+
+    body.light input, 
+    body.light select {
+      background-color: var(--input-bg-light);
+      color: var(--text-color-light);
+      border: 1px solid var(--input-border-light);
+    }
+
+    body.light .result {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    body.light .history-item {
+      background-color: rgba(76, 175, 80, 0.05);
+      border: 1px solid rgba(76, 175, 80, 0.1);
+    }
+
+    body.light .theme-toggle {
+      color: var(--text-color-light);
+    }
+
+    body.light footer {
+      background-color: rgba(0, 0, 0, 0.03);
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* Dark theme */
+    body.dark {
+      background-color: var(--bg-color-dark);
+      color: var(--text-color-dark);
+    }
+
+    body.dark .container {
+      background-color: var(--container-bg-dark);
+      box-shadow: 0 4px 12px var(--shadow-dark);
+      border: 1px solid var(--border-dark);
+    }
+
+    body.dark input, 
+    body.dark select {
+      background-color: var(--input-bg-dark);
+      color: var(--text-color-dark);
+      border: 1px solid var(--input-border-dark);
+    }
+
+    body.dark .result {
+      background-color: rgba(76, 175, 80, 0.15);
+    }
+
+    body.dark .history-item {
+      background-color: rgba(76, 175, 80, 0.1);
+      border: 1px solid rgba(76, 175, 80, 0.15);
+    }
+
+    body.dark .theme-toggle {
+      color: var(--text-color-dark);
+    }
+
+    body.dark footer {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid var(--border-dark);
+    }
+
+    @media screen and (max-width: 768px) {
+      .main-content {
+        padding: 1.5rem;
+      }
+
+      .container {
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .menu-item {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .main-content {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 1.2rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .menu {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .menu-item {
+        margin: 0.3rem 0;
+        width: 80%;
+      }
+
+      .theme-toggle {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+
+      .language-toggle {
+        top: 0.5rem;
+        right: -7rem; /* Adjust spacing for mobile */
+      }
+    }
+  </style>
+</head>
+<body class="light">
+  <button class="language-toggle" aria-label="Select language">
+    <img id="language-icon" src="https://flagcdn.com/w40/es.png" alt="Spanish flag" width="24" height="18">
+    <div class="language-dropdown" id="language-dropdown">
+      <div class="language-option" data-lang="ca" onclick="changeLanguage('ca')">
+        <img class="flag" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Flag_of_Catalonia.svg/1200px-Flag_of_Catalonia.svg.png" alt="Catalan flag" width="24" height="18"> Català
+      </div>
+      <div class="language-option" data-lang="es" onclick="changeLanguage('es')">
+        <img class="flag" src="https://flagcdn.com/w40/es.png" alt="Spanish flag" width="24" height="18"> Español
+      </div>
+      <div class="language-option" data-lang="en" onclick="changeLanguage('en')">
+        <img class="flag" src="https://flagcdn.com/w40/gb.png" alt="British flag" width="24" height="18"> English
+      </div>
+    </div>
+  </button>
+  
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span id="theme-icon">🌙</span>
+  </button>
+  
+  <div class="main-content">
+    <h1 id="title">🛌 Calculadora de Ciclos de Sueño</h1>
+    
+    <div class="menu">
+      <div class="menu-item active" onclick="showSection('calculator')" id="menu-calculator">Calculadora</div>
+      <div class="menu-item" onclick="showSection('history')" id="menu-history">Tus Datos</div>
+    </div>
+    
+    <div class="container section active" id="calculator">
+      <label for="wakeUp">¿A qué hora necesitas despertarte?</label>
+      <input type="time" id="wakeUp" required>
+
+      <label for="cycles">¿Cuántos ciclos REM quieres dormir?</label>
+      <select id="cycles">
+        <option value="4">4 ciclos (6 horas)</option>
+        <option value="5" selected>5 ciclos (7 h 30 min)</option>
+        <option value="6">6 ciclos (9 horas)</option>
+      </select>
+
+      <label for="fallAsleep">¿Cuánto tardas en dormirte? (minutos)</label>
+      <input type="number" id="fallAsleep" value="15" min="0" max="60">
+
+      <button onclick="calculate()">Calcular hora de dormir</button>
+
+      <div id="output" class="result"></div>
+    </div>
+    
+    <div class="container section" id="history">
+      <h2>Historial de Cálculos</h2>
+      <div id="history-list">
+        <!-- History items will be added here -->
+      </div>
+      <button onclick="clearHistory()">Borrar historial</button>
+    </div>
+  </div>
+
+  <footer>
+    Developed by Miquel Suriñach Mondelo
+  </footer>
+
+  <script>
+    // Language translations
+    const translations = {
+      ca: {
+        title: "🛌 Calculadora de Cicles de Son",
+        menuCalculator: "Calculadora",
+        menuHistory: "Les teves Dades",
+        wakeUpLabel: "A quina hora necessites despertar-te?",
+        cyclesLabel: "Quants cicles REM vols dormir?",
+        cycles4: "4 cicles (6 hores)",
+        cycles5: "5 cicles (7 h 30 min)",
+        cycles6: "6 cicles (9 hores)",
+        fallAsleepLabel: "Quant tardes a adormir-te? (minuts)",
+        calculateButton: "Calcular hora de dormir",
+        historyTitle: "Historial de Càlculs",
+        noHistoryData: "Encara no hi ha dades desades.",
+        clearHistoryButton: "Esborrar historial",
+        clearHistoryConfirm: "Estàs segur que vols esborrar tot l'historial?",
+        sleepTimeAlert: "Si us plau, introdueix una hora de despertar.",
+        resultSleepTime: "⏰ Hora recomanada per dormir:",
+        resultDuration: "😴 Durada del son:",
+        resultCycles: "🔁 Cicles complets:",
+        resultTip: "🧠 Consell: Dormir en cicles complets evita interrompre fases REM i millora el teu descans.",
+        historyDate: "Data:",
+        historyWakeUp: "Despertar:",
+        historySleep: "Dormir:",
+        historyCycles: "Cicles:",
+        historyDuration: "Durada:"
+      },
+      es: {
+        title: "🛌 Calculadora de Ciclos de Sueño",
+        menuCalculator: "Calculadora",
+        menuHistory: "Tus Datos",
+        wakeUpLabel: "¿A qué hora necesitas despertarte?",
+        cyclesLabel: "¿Cuántos ciclos REM quieres dormir?",
+        cycles4: "4 ciclos (6 horas)",
+        cycles5: "5 ciclos (7 h 30 min)",
+        cycles6: "6 ciclos (9 horas)",
+        fallAsleepLabel: "¿Cuánto tardas en dormirte? (minutos)",
+        calculateButton: "Calcular hora de dormir",
+        historyTitle: "Historial de Cálculos",
+        noHistoryData: "No hay datos guardados todavía.",
+        clearHistoryButton: "Borrar historial",
+        clearHistoryConfirm: "¿Estás seguro de que quieres borrar todo el historial?",
+        sleepTimeAlert: "Por favor, introduce una hora de despertar.",
+        resultSleepTime: "⏰ Hora recomendada para dormir:",
+        resultDuration: "😴 Duración del sueño:",
+        resultCycles: "🔁 Ciclos completos:",
+        resultTip: "🧠 Consejo: Dormir en ciclos completos evita interrumpir fases REM y mejora tu descanso.",
+        historyDate: "Fecha:",
+        historyWakeUp: "Despertar:",
+        historySleep: "Dormir:",
+        historyCycles: "Ciclos:",
+        historyDuration: "Duración:"
+      },
+      en: {
+        title: "🛌 Sleep Cycle Calculator",
+        menuCalculator: "Calculator",
+        menuHistory: "Your Data",
+        wakeUpLabel: "What time do you need to wake up?",
+        cyclesLabel: "How many REM cycles do you want to sleep?",
+        cycles4: "4 cycles (6 hours)",
+        cycles5: "5 cycles (7 h 30 min)",
+        cycles6: "6 cycles (9 hours)",
+        fallAsleepLabel: "How long does it take you to fall asleep? (minutes)",
+        calculateButton: "Calculate bedtime",
+        historyTitle: "Calculation History",
+        noHistoryData: "No saved data yet.",
+        clearHistoryButton: "Clear history",
+        clearHistoryConfirm: "Are you sure you want to delete all history?",
+        sleepTimeAlert: "Please enter a wake-up time.",
+        resultSleepTime: "⏰ Recommended bedtime:",
+        resultDuration: "😴 Sleep duration:",
+        resultCycles: "🔁 Complete cycles:",
+        resultTip: "🧠 Tip: Sleeping in complete cycles prevents interrupting REM phases and improves your rest.",
+        historyDate: "Date:",
+        historyWakeUp: "Wake up:",
+        historySleep: "Sleep:",
+        historyCycles: "Cycles:",
+        historyDuration: "Duration:"
+      }
+    };
+    
+    // Current language (default to Spanish)
+    let currentLanguage = localStorage.getItem('language') || 'es';
+
+    // Toggle language dropdown
+    document.addEventListener('DOMContentLoaded', function() {
+      const languageToggle = document.querySelector('.language-toggle');
+      const dropdown = document.getElementById('language-dropdown');
+      
+      languageToggle.addEventListener('click', function(event) {
+        event.stopPropagation();
+        dropdown.classList.toggle('show');
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!languageToggle.contains(event.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+      
+      // Prevent dropdown from closing when clicking inside it
+      dropdown.addEventListener('click', function(event) {
+        event.stopPropagation();
+      });
+    });
+
+    // Change language function
+    function changeLanguage(lang) {
+      currentLanguage = lang;
+      localStorage.setItem('language', currentLanguage);
+      updateLanguageIcon(currentLanguage);
+      updateActiveLanguageOption();
+      applyTranslations();
+      loadHistory(); // Reload history with new language
+      
+      // Hide dropdown after selection
+      document.getElementById('language-dropdown').classList.remove('show');
+    }
+    
+    function updateLanguageIcon(language) {
+      const languageIcon = document.getElementById('language-icon');
+      switch(language) {
+        case 'ca':
+          languageIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Flag_of_Catalonia.svg/1200px-Flag_of_Catalonia.svg.png';
+          languageIcon.alt = 'Catalan flag';
+          break;
+        case 'es':
+          languageIcon.src = 'https://flagpedia.net/data/flags/w580/es.webp';
+          languageIcon.alt = 'Spanish flag';
+          break;
+        case 'en':
+          languageIcon.src = 'https://flagpedia.net/data/flags/w580/us.webp';
+          languageIcon.alt = 'British flag';
+          break;
+      }
+    }
+    
+    function updateActiveLanguageOption() {
+      // Remove active class from all options
+      document.querySelectorAll('.language-option').forEach(option => {
+        option.classList.remove('active');
+      });
+      
+      // Add active class to current language
+      const activeOption = document.querySelector(`.language-option[data-lang="${currentLanguage}"]`);
+      if (activeOption) {
+        activeOption.classList.add('active');
+      }
+    }
+
+    // Check for saved theme preference or use system preference
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.body.className = savedTheme;
+        updateThemeIcon(savedTheme);
+      } else {
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.body.className = 'dark';
+          updateThemeIcon('dark');
+        }
+      }
+      
+      // Load saved language or default to Spanish
+      const savedLanguage = localStorage.getItem('language');
+      if (savedLanguage) {
+        currentLanguage = savedLanguage;
+        updateLanguageIcon(currentLanguage);
+      }
+      
+      // Update active language option
+      updateActiveLanguageOption();
+      
+      // Apply translations
+      applyTranslations();
+      
+      // Load history
+      loadHistory();
+    });
+
+    // Remove the old toggleLanguage function since we now use changeLanguage
+    // function toggleLanguage() { ... }
+    
+    function applyTranslations() {
+      const t = translations[currentLanguage];
+      
+      // Update page title
+      document.getElementById('title').textContent = t.title;
+      
+      // Update menu items
+      document.getElementById('menu-calculator').textContent = t.menuCalculator;
+      document.getElementById('menu-history').textContent = t.menuHistory;
+      
+      // Update calculator section
+      document.querySelector('label[for="wakeUp"]').textContent = t.wakeUpLabel;
+      document.querySelector('label[for="cycles"]').textContent = t.cyclesLabel;
+      document.querySelector('label[for="fallAsleep"]').textContent = t.fallAsleepLabel;
+      
+      // Update dropdown options
+      const cyclesSelect = document.getElementById('cycles');
+      cyclesSelect.options[0].textContent = t.cycles4;
+      cyclesSelect.options[1].textContent = t.cycles5;
+      cyclesSelect.options[2].textContent = t.cycles6;
+      
+      // Update buttons
+      document.querySelector('#calculator button').textContent = t.calculateButton;
+      document.querySelector('#history button').textContent = t.clearHistoryButton;
+      
+      // Update history section
+      document.querySelector('#history h2').textContent = t.historyTitle;
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.body.className;
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.body.className = newTheme;
+      localStorage.setItem('theme', newTheme);
+      
+      updateThemeIcon(newTheme);
+    }
+    
+    function updateThemeIcon(theme) {
+      const themeIcon = document.getElementById('theme-icon');
+      themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Remove active class from all menu items
+      document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Show selected section
+      document.getElementById(sectionId).classList.add('active');
+      
+      // Add active class to clicked menu item
+      event.target.classList.add('active');
+    }
+
+    function calculate() {
+      const wakeUp = document.getElementById("wakeUp").value;
+      const cycles = parseInt(document.getElementById("cycles").value);
+      const fallAsleep = parseInt(document.getElementById("fallAsleep").value);
+
+      if (!wakeUp) {
+        alert(translations[currentLanguage].sleepTimeAlert);
+        return;
+      }
+
+      const [wakeHour, wakeMin] = wakeUp.split(":").map(Number);
+      const wakeDate = new Date();
+      wakeDate.setHours(wakeHour, wakeMin, 0, 0);
+
+      const totalSleepMinutes = cycles * 90 + fallAsleep;
+      const bedtime = new Date(wakeDate.getTime() - totalSleepMinutes * 60000);
+
+      const sleepHour = bedtime.getHours().toString().padStart(2, "0");
+      const sleepMin = bedtime.getMinutes().toString().padStart(2, "0");
+      const sleepTimeStr = `${sleepHour}:${sleepMin}`;
+
+      const hours = Math.floor((cycles * 90) / 60);
+      const minutes = (cycles * 90) % 60;
+
+      const t = translations[currentLanguage];
+      const resultText = `
+        <strong>${t.resultSleepTime}</strong> ${sleepTimeStr}<br>
+        <strong>${t.resultDuration}</strong> ${hours} h ${minutes} min<br>
+        <strong>${t.resultCycles}</strong> ${cycles}<br>
+        <strong>${t.resultTip}</strong>
+      `;
+      
+      document.getElementById("output").innerHTML = resultText;
+      
+      // Save to history
+      saveToHistory({
+        date: new Date().toLocaleDateString(),
+        wakeUp: wakeUp,
+        sleepTime: sleepTimeStr,
+        cycles: cycles,
+        duration: `${hours} h ${minutes} min`
+      });
+    }
+    
+    function saveToHistory(item) {
+      let history = JSON.parse(localStorage.getItem('sleepHistory')) || [];
+      history.unshift(item); // Add to beginning of array
+      
+      // Keep only the last 10 entries
+      if (history.length > 10) {
+        history = history.slice(0, 10);
+      }
+      
+      localStorage.setItem('sleepHistory', JSON.stringify(history));
+      loadHistory(); // Refresh the history display
+    }
+    
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem('sleepHistory')) || [];
+      const historyList = document.getElementById('history-list');
+      const t = translations[currentLanguage];
+      
+      if (history.length === 0) {
+        historyList.innerHTML = `<p>${t.noHistoryData}</p>`;
+        return;
+      }
+      
+      let html = '';
+      history.forEach(item => {
+        html += `
+          <div class="history-item">
+            <strong>${t.historyDate}</strong> ${item.date}<br>
+            <strong>${t.historyWakeUp}</strong> ${item.wakeUp}<br>
+            <strong>${t.historySleep}</strong> ${item.sleepTime}<br>
+            <strong>${t.historyCycles}</strong> ${item.cycles}<br>
+            <strong>${t.historyDuration}</strong> ${item.duration}
+          </div>
+        `;
+      });
+      
+      historyList.innerHTML = html;
+    }
+    
+    function clearHistory() {
+      if (confirm(translations[currentLanguage].clearHistoryConfirm)) {
+        localStorage.removeItem('sleepHistory');
+        loadHistory();
+      }
+    }
+  </script>
+</body>
+</html>
