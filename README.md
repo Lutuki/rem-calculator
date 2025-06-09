@@ -15,7 +15,7 @@ Sistemas operativos compatibles:
 - Android
 - Todos los compatibles con buscadores...
 
- Accede a nuestra página aquí: | [¡Click aquí para ir a la página!](https://bit.ly/rem-calc) |
+ Accede a nuestra página aquí: | [https://bit.ly/rem-calc](https://bit.ly/rem-calc) |
 | -------- | ---- |
 
 Al utilizar esta página aceptas que se envíen los siguientes datos del sistema a github.io/Lutuki con el fin del funcionamento del mismo:
